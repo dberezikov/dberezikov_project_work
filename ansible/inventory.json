@@ -1,0 +1,16 @@
+{
+    "_meta": {
+        "hostvars": {}
+    },
+    "all": {
+        "children": [
+            "ungrouped"
+        ]
+    },
+    "ungrouped": {
+        "hosts": [
+            "51.250.77.185",
+            "51.250.77.222"
+        ]
+    }
+}
