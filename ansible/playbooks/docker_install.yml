@@ -13,7 +13,7 @@
         - software-properties-common
         - python3-pip
         - gnupg
-        state: present
+        state: latest
 
     - name: Add Docker apt key
       apt_key:
@@ -37,3 +37,9 @@
     - name: Install Docker module for Python
       pip:
         name: docker
+
+    - name: Install docker-compose from official github repo
+      get_url:
+        url : https://github.com/docker/compose/releases/download/1.23.1/docker-compose-linux-x86_64
+        dest: /usr/local/bin/docker-compose
+        mode: 'u+x,g+x'

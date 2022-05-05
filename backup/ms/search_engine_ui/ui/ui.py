@@ -12,8 +12,8 @@ CONTENT_TYPE_LATEST = str('text/plain; version=0.0.4; charset=utf-8')
 COUNTER_PAGES_SERVED = prometheus_client.Counter('web_pages_served', 'Number of pages served by frontend')
 HISTOGRAM_PAGE_GEN_TIME = prometheus_client.Histogram('web_page_gen_time', 'Page generation time')
 
-# logg = logging.getLogger('werkzeug')
-# logg.disabled = True   # disable default logger
+logg = logging.getLogger('werkzeug')
+logg.disabled = True   # disable default logger
 
 log = structlog.get_logger()
 structlog.configure(processors=[

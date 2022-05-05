@@ -1,0 +1,58 @@
+version: "3"
+
+services:
+  mongodb:
+    image: mongo
+    restart: always
+    container_name: mongodb
+    volumes:
+      - ./services/db/store:/data/db
+    ports:
+      - 27017:27017
+    networks:
+      - app
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    restart: always
+    container_name: rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=crawler
+      - RABBITMQ_DEFAULT_PASS=123456789
+    volumes:
+      - ./services/rabbitmq/data/:/var/lib/rabbitmq/
+      - ./services/rabbitmq/log/:/var/log/rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
+    networks:
+      - app
+
+  crawler:
+    image: seeker00837149/crawler
+    container_name: crawler
+    environment:
+      - MONGO=mongodb
+      - MONGO_PORT=27017
+      - RMQ_HOST=rabbitmq
+      - RMQ_QUEUE=crawler
+      - RMQ_USERNAME=crawler
+      - RMQ_PASSWORD=123456789
+      - CHECK_INTERVAL=20
+      - EXCLUDE_URLS=.*github.com
+    networks:
+      - app
+
+  ui:
+    image: seeker00837149/web_ui
+    container_name: ui
+    environment:
+      - MONGO=mongodb
+      - MONGO_PORT=27017
+    ports:
+      - 8080:8000
+    networks:
+      - app
+
+networks:
+  app:

@@ -1,3 +1,3 @@
-output "external_ip_address_k8s" {
-  value = yandex_compute_instance.k8s[*].network_interface.0.nat_ip_address
+output "external_ip_address_ms" {
+  value = yandex_compute_instance.ms[*].network_interface.0.nat_ip_address
 }

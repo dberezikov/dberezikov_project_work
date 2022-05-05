@@ -18,7 +18,7 @@ data "yandex_compute_image" "ubuntu-image" {
   family = "ubuntu-1804-lts"
 }
 
-resource "yandex_compute_instance" "k8s" {
+resource "yandex_compute_instance" "ms" {
   name = "node${1+count.index}"
   count = var.count_of_instances
 
