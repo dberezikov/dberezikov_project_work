@@ -15,7 +15,7 @@ provider "yandex" {
 }
 
 data "yandex_compute_image" "ubuntu-image" {
-  family = "ubuntu-1804-lts"
+  family = var.os_release
 }
 
 resource "yandex_compute_instance" "ms" {

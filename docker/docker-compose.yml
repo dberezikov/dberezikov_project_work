@@ -57,7 +57,7 @@ services:
       - MONGO=mongodb
       - MONGO_PORT=27017
     ports:
-      - 8080:8000
+      - 80:8000
     depends_on:
       - mongodb
       - crawler

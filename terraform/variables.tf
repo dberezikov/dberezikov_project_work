@@ -15,6 +15,9 @@ variable region {
   description = "Region"
   default = "ru-central1"
 }
+variable os_release {
+  description = "Version of OS"
+}
 variable public_key_path {
   description = "Path to the public key used for ssh access"
 }
