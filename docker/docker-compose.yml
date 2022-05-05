@@ -1,0 +1,74 @@
+version: "3"
+
+services:
+  mongodb:
+    image: mongo
+    restart: always
+    container_name: mongodb
+    volumes:
+      - mongo_db:/data/db
+    ports:
+      - 27017:27017
+    networks:
+      - app
+
+  rabbitmq:
+    image: rabbitmq:3.9-management
+    restart: always
+    container_name: rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=crawler
+      - RABBITMQ_DEFAULT_PASS=123456789
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq/
+      - rabbitmq_log:/var/log/rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
+    networks:
+      - app
+
+  crawler:
+    image: seeker00837149/crawler
+    restart: on-failure
+    container_name: crawler
+    environment:
+      - MONGO=mongodb
+      - MONGO_PORT=27017
+      - RMQ_HOST=rabbitmq
+      - RMQ_QUEUE=crawler
+      - RMQ_USERNAME=crawler
+      - RMQ_PASSWORD=123456789
+      - CHECK_INTERVAL=20
+      - EXCLUDE_URLS=.*github.com
+    ports:
+      - 8000:8000
+    depends_on:
+      - mongodb
+      - rabbitmq
+    networks:
+      - app
+
+  ui:
+    image: seeker00837149/web_ui
+    restart: on-failure
+    container_name: ui
+    environment:
+      - MONGO=mongodb
+      - MONGO_PORT=27017
+    ports:
+      - 80:8000
+    depends_on:
+      - mongodb
+      - crawler
+    networks:
+      - app
+
+volumes:
+  mongo_db:
+  rabbitmq_data:
+  rabbitmq_log:
+
+networks:
+  app:
+    driver: bridge

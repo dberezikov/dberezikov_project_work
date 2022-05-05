@@ -1,0 +1,20 @@
+---
+- name: MS install
+  hosts: all
+  become: true
+  tasks:
+    - name: Create a directory if it does not exist
+      ansible.builtin.file:
+        path: /home/ubuntu/ms
+        state: directory
+        mode: '0755'
+
+    - name: Copy directory of microservices
+      copy: 
+        src: ../../docker
+        dest: /home/ubuntu/ms
+
+    - name: Deploy Docker Compose stack
+      community.docker.docker_compose:
+        project_src: /home/ubuntu/ms/docker
+        files: docker-compose.yml
