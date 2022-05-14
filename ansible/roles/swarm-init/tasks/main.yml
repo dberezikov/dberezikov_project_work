@@ -5,26 +5,26 @@
     advertise_addr: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}" 
   register: token
 
-- name: Check directory for keep tokens
-  local_action:
-    module: file
+- name: Check directory for keep tokens and manager address
+  file:
     path: ./tokens
     state: directory
+  delegate_to: localhost
 
 - name: Save manager token
-  local_action:
-    module: copy
+  copy:
     dest: ./tokens/manager-token
     content: "{{ token.swarm_facts.JoinTokens.Manager }}"
+  delegate_to: localhost
 
 - name: Save workers token
-  local_action:
-    module: copy
+  copy:
     dest: ./tokens/worker-token
     content: "{{ token.swarm_facts.JoinTokens.Worker }}"
+  delegate_to: localhost
 
 - name: Save manager address
-  local_action:
-    module: copy
+  copy:
     dest: ./tokens/manager-address
     content: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
+  delegate_to: localhost
