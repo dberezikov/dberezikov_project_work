@@ -48,19 +48,3 @@ resource "yandex_compute_instance" "node" {
   }
 
 }
-
-locals {
-  names = yandex_compute_instance.node.*.name
-  ips   = yandex_compute_instance.node.*.network_interface.0.nat_ip_address
-}
-
-# Invetrory for ansible
-resource "local_file" "inventory" {
-  content = templatefile("inventory.tpl",
-    {
-      names = local.names,
-      addrs = local.ips,
-    }
-  )
-  filename = "../ansible/inventory.ini"
-}

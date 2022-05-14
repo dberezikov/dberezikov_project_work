@@ -10,14 +10,14 @@ if [ "$1" == "--list" ] ; then
   yc compute instance list | grep RUNNING | awk '{print$10}' > inventory_ip_temp
   pr -mts' ansible_host=' inventory_host_temp inventory_ip_temp > pre-inventory_temp
   sort -k 1 pre-inventory_temp >> sorted_inventory_temp
-  echo "[master]" >> inventory_temp
+  echo "[manager]" >> inventory_temp
   cat sorted_inventory_temp | grep node | grep node0 >> inventory_temp
   echo "[workers]" >> inventory_temp
   cat sorted_inventory_temp | grep node | grep -v node0 >> inventory_temp
   echo "[no_groups]" >> inventory_temp
   cat sorted_inventory_temp | grep -v node >> inventory_temp
   ansible-inventory --list -i inventory_temp
-  rm inventory_host_temp inventory_ip_temp inventory_temp sorted_inventory_temp
+  rm inventory_host_temp inventory_ip_temp inventory_temp pre-inventory_temp sorted_inventory_temp
 elif [ "$1" == "--host" ]; then
           echo '{"_meta": {"hostvars": {}}}'
   else

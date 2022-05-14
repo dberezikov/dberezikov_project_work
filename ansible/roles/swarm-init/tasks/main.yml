@@ -1,0 +1,30 @@
+---
+- name: Initialize Docker Swarm
+  docker_swarm:
+    state: present
+    advertise_addr: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}" 
+  register: token
+
+- name: Check directory for keep tokens
+  local_action:
+    module: file
+    path: ./tokens
+    state: directory
+
+- name: Save manager token
+  local_action:
+    module: copy
+    dest: ./tokens/manager-token
+    content: "{{ token.swarm_facts.JoinTokens.Manager }}"
+
+- name: Save workers token
+  local_action:
+    module: copy
+    dest: ./tokens/worker-token
+    content: "{{ token.swarm_facts.JoinTokens.Worker }}"
+
+- name: Save manager address
+  local_action:
+    module: copy
+    dest: ./tokens/manager-address
+    content: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
