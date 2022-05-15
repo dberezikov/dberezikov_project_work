@@ -25,5 +25,16 @@ module "node" {
   cores                    = var.cores
   memory                   = var.memory
   boot_disk_size           = var.boot_disk_size
-  boot_disk_type           = var.boot_disk_type
+  boot_disk_type           = var.boot_disk_type  
+}
+
+resource "null_resource" "ansible" {
+  depends_on = [module.node]
+  provisioner "local-exec" {
+    command = "sleep 30"
+  }
+  provisioner "local-exec" {
+    command     = "ansible-playbook playbook.yml"
+    working_dir = "../ansible"
+  }
 }
