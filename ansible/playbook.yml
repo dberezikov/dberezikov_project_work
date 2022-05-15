@@ -16,3 +16,16 @@
   become: true
   roles:
     - workers-join
+    
+- name: Add db node label
+  hosts: manager
+  become: true
+  roles:
+    - node-label-db 
+
+- name: Deploy applications
+  hosts: manager
+  become: true
+  roles:
+    - app-deploy 
+

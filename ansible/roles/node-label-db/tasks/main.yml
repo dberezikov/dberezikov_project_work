@@ -1,0 +1,6 @@
+---
+- name: Merge node labels and new labels
+  docker_node:
+    hostname: node1
+    labels:
+      key: db

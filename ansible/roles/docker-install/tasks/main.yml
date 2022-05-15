@@ -37,3 +37,7 @@
 - name: Install Python Docker module
   pip:
     name: docker-compose
+
+- name: Install JSON Diff
+  pip:
+    name: jsondiff

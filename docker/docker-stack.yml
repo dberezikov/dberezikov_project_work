@@ -3,7 +3,6 @@ version: "3"
 services:
   mongodb:
     image: mongo
-    restart: always
     volumes:
       - mongo_db:/data/db
     ports:
@@ -15,11 +14,10 @@ services:
         condition: on-failure
       placement:
         constraints:
-          - node.labels.db == true 
+          - node.labels.key == db
 
   rabbitmq:
     image: rabbitmq:3.9-management
-    restart: always
     environment:
       - RABBITMQ_DEFAULT_USER=crawler
       - RABBITMQ_DEFAULT_PASS=123456789
@@ -36,11 +34,10 @@ services:
         condition: on-failure
       placement:
         constraints:
-          - node.labels.db == true 
+          - node.labels.key == db 
 
   crawler:
     image: seeker00837149/crawler
-    restart: on-failure
     environment:
       - MONGO=mongodb
       - MONGO_PORT=27017
@@ -52,9 +49,6 @@ services:
       - EXCLUDE_URLS=.*github.com
     ports:
       - 8000:8000
-    depends_on:
-      - mongodb
-      - rabbitmq
     networks:
       - app
     deploy:
@@ -65,15 +59,11 @@ services:
 
   ui:
     image: seeker00837149/web_ui
-    restart: on-failure
     environment:
       - MONGO=mongodb
       - MONGO_PORT=27017
     ports:
       - 80:8000
-    depends_on:
-      - mongodb
-      - crawler
     networks:
       - app
     deploy:
@@ -81,20 +71,6 @@ services:
       replicas: 2 
       restart_policy:
         condition: on-failure
-
-  cadvisor:
-    image: google/cadvisor
-    hostname: '{{.Node.ID}}'
-    command: -logtostderr -docker_only -storage_driver=influxdb -storage_driver_db=cadvisor -storage_driver_host=influx:8086
-    volumes:
-      - /:/rootfs:ro
-      - /var/run:/var/run:rw
-      - /sys:/sys:ro
-      - /var/lib/docker/:/var/lib/docker:ro
-    depends_on:
-      - influx
-    deploy:
-      mode: global
 
 volumes:
   mongo_db:
