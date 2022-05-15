@@ -29,3 +29,9 @@
   roles:
     - app-deploy 
 
+- name: Deploy monitoring 
+  hosts: manager
+  become: true
+  roles:
+    - mon-deploy 
+
