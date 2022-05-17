@@ -5,7 +5,9 @@ services:
 #    image: influxdb   
     image: influxdb:1.8-alpine   
     volumes:     
-      - influx:/var/lib/influxdb
+      - influx:/var/lib/influxdbi
+    environment:
+      - INFLUXDB_DB=cadvisor        
     networks:
       - crawler_app
     deploy: 

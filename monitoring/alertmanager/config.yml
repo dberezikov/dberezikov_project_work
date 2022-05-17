@@ -1,6 +1,6 @@
 global:
   resolve_timeout: 1m
-  slack_api_url: 'https://hooks.slack.com/services/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'
+  slack_api_url: 'https://hooks.slack.com/services/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'
 
 route:
  receiver: 'slack'
@@ -10,4 +10,4 @@ receivers:
   slack_configs:
   - send_resolved: true
     username: 'crawler_bot'
-    channel: '#crawler'
+    channel: '#dmitriy_berezikov'
