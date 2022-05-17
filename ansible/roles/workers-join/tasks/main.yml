@@ -1,0 +1,7 @@
+---
+- name: Add Workers to the Swarm
+  docker_swarm:
+    state: join
+    remote_addrs: "{{ manager_addrs }}"
+    join_token: "{{ token }}" 
+

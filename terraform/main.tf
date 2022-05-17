@@ -1,10 +1,10 @@
 terraform {
   required_providers {
     yandex = {
-      source = "terraform-registry.storage.yandexcloud.net/yandex-cloud/yandex"
+      source = "yandex-cloud/yandex"
+      version = "0.74.0"
     }
   }
-  required_version = ">= 0.13"
 }
 
 provider "yandex" {
@@ -14,43 +14,42 @@ provider "yandex" {
   zone                     = var.zone
 }
 
-data "yandex_compute_image" "ubuntu-image" {
-  family = var.os_release
+module "node" {
+  source                   = "./modules/nodes"
+  public_key_path          = var.public_key_path
+  private_key_path         = var.private_key_path
+  subnet_id                = var.subnet_id
+  count_of_node_instances  = var.count_of_node_instances 
+  os_release               = var.os_release
+  core_fraction            = var.core_fraction
+  cores_node               = var.cores_node
+  memory_node              = var.memory_node
+  boot_disk_size           = var.boot_disk_size
+  boot_disk_type           = var.boot_disk_type  
 }
 
-resource "yandex_compute_instance" "ms" {
-  name = "node${1+count.index}"
-  count = var.count_of_instances
+module "monitoring" {
+  source                   = "./modules/monitoring"
+  public_key_path          = var.public_key_path
+  private_key_path         = var.private_key_path
+  subnet_id                = var.subnet_id
+  count_of_mon_instances   = var.count_of_mon_instances 
+  os_release               = var.os_release
+  core_fraction            = var.core_fraction
+  cores_mon                = var.cores_mon
+  memory_mon               = var.memory_mon
+  boot_disk_size           = var.boot_disk_size
+  boot_disk_type           = var.boot_disk_type  
+  depends_on = [module.node]
+}
 
-  resources {
-    core_fraction = 20
-    cores  = 4
-    memory = 4
+resource "null_resource" "ansible" {
+  depends_on = [module.monitoring] 
+  provisioner "local-exec" {
+    command = "sleep 60"
   }
-
-  boot_disk {
-    initialize_params {
-      image_id = data.yandex_compute_image.ubuntu-image.image_id
-      size     = 40
-      type     = "network-ssd"
-    }
+  provisioner "local-exec" {
+    command     = "ansible-playbook playbook.yml"
+    working_dir = "../ansible"
   }
-
-  network_interface {
-    subnet_id = var.subnet_id
-    nat       = true
-  }
-
-  metadata = {
-    ssh-keys = "ubuntu:${file(var.public_key_path)}"
-  }
-
-  connection {
-    type  = "ssh"
-    host  = self.network_interface.0.nat_ip_address
-    user  = "ubuntu"
-    agent = false
-    private_key = file(var.private_key_path)
-  }
-
 }

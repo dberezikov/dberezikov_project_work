@@ -1,0 +1,113 @@
+groups:
+- name: tasks
+  rules:
+
+  - alert: task_high_cpu_usage_SWARM_cluster_80
+    expr: sum(rate(container_cpu_usage_seconds_total{container_label_com_docker_swarm_task_name=~".+"}[1m]))
+      BY (container_label_com_docker_swarm_task_name, container_label_com_docker_swarm_node_id)
+      * 100 > 80
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      description: '{{ $labels.container_label_com_docker_swarm_task_name }} on ''{{
+        $labels.container_label_com_docker_swarm_node_id }}'' CPU usage is at {{ humanize
+        $value}}%.'
+      summary: CPU alert for Swarm task '{{ $labels.container_label_com_docker_swarm_task_name
+        }}' on '{{ $labels.container_label_com_docker_swarm_node_id }}'
+#               
+  - alert: task_high_memory_usage_SWARM_cluster_200MB
+    expr: sum(container_memory_rss{container_label_com_docker_swarm_task_name!~".+prometheus.+",container_label_com_docker_swarm_task_name!~".+jenkins.+",container_label_com_docker_swarm_task_name=~".+"}) 
+       by(container_label_com_docker_swarm_task_name, container_label_com_docker_swarm_node_id) > 2e+08
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      description: '{{ $labels.container_label_com_docker_swarm_task_name }} on ''{{
+        $labels.container_label_com_docker_swarm_node_id }}'' memory usage is {{ humanize
+        $value}}.'
+      summary: Memory alert for Swarm task '{{ $labels.container_label_com_docker_swarm_task_name
+        }}' on '{{ $labels.container_label_com_docker_swarm_node_id }}'
+#
+  - alert: task_high_memory_usage_SWARM_cluster_400MB
+    expr: sum(container_memory_rss{container_label_com_docker_swarm_task_name!~".+prometheus.+",container_label_com_docker_swarm_task_name!~".+jenkins.+",container_label_com_docker_swarm_task_name=~".+"})
+      BY (container_label_com_docker_swarm_task_name, container_label_com_docker_swarm_node_id) > 4e+08
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      description: '{{ $labels.container_label_com_docker_swarm_task_name }} on ''{{
+        $labels.container_label_com_docker_swarm_node_id }}'' memory usage is {{ humanize
+        $value}}.'
+      summary: Memory alert for Swarm task '{{ $labels.container_label_com_docker_swarm_task_name
+        }}' on '{{ $labels.container_label_com_docker_swarm_node_id }}'  
+#
+  - alert: task_high_memory_usage_SWARM_cluster_prometheus_800MB
+    expr: sum(container_memory_rss{container_label_com_docker_swarm_task_name=~".+prometheus.+"}) 
+      by(container_label_com_docker_swarm_task_name, container_label_com_docker_swarm_node_id) > 8e+08
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      description: '{{ $labels.container_label_com_docker_swarm_task_name }} on ''{{
+        $labels.container_label_com_docker_swarm_node_id }}'' memory usage is {{ humanize
+        $value}}.'
+      summary: Memory alert for Swarm task '{{ $labels.container_label_com_docker_swarm_task_name
+        }}' on '{{ $labels.container_label_com_docker_swarm_node_id }}' 
+
+  - alert: task_high_memory_usage_SWARM_cluster_jenkins_850MB
+    expr: sum(container_memory_rss{container_label_com_docker_swarm_task_name=~".+jenkins.+"}) 
+      by(container_label_com_docker_swarm_task_name, container_label_com_docker_swarm_node_id) > 8.5e+08
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      description: '{{ $labels.container_label_com_docker_swarm_task_name }} on ''{{
+        $labels.container_label_com_docker_swarm_node_id }}'' memory usage is {{ humanize
+        $value}}.'
+      summary: Memory alert for Swarm task '{{ $labels.container_label_com_docker_swarm_task_name
+        }}' on '{{ $labels.container_label_com_docker_swarm_node_id }}'  
+ 
+  - alert: Service prometheus is down in SWARM cluster
+    expr: absent(container_memory_usage_bytes{container_label_com_docker_swarm_service_name=~".+_prometheus"}) 
+    for: 2m
+    labels:
+     severity: critical
+    annotations:
+     description: Service 'prometheus' is down for more 2 minutes
+     summary: Service alert for SWARM service 'prometheus'
+
+  - alert: Service grafana is down in SWARM cluster
+    expr: absent(container_memory_usage_bytes{container_label_com_docker_swarm_service_name=~".+_grafana"}) 
+    for: 2m
+    labels:
+     severity: critical
+    annotations:
+     description: Service 'grafana' is down for more 2 minutes
+     summary: Service alert for SWARM service 'grafana'
+
+  - alert: Service alertmanager is down in SWARM cluster
+    expr: absent(container_memory_usage_bytes{container_label_com_docker_swarm_service_name=~".+_alertmanager"}) 
+    for: 2m
+    labels:
+     severity: critical
+    annotations:
+     description: Service 'alertmanager' is down for more 2 minutes
+     summary: Service alert for SWARM service 'alertmanager'
+
+  - alert: task_high_memory_usage_SWARM_cluster_percent_80
+    expr: ( sum by(container_label_com_docker_swarm_service_name, container_label_com_docker_swarm_node_id)
+          (avg_over_time(container_memory_usage_bytes{container_label_com_docker_swarm_node_id=~".+", id=~"/docker/.+"}[1m]))
+          /
+          (sum by(container_label_com_docker_swarm_service_name, container_label_com_docker_swarm_node_id) 
+          (container_spec_memory_limit_bytes{container_label_com_docker_swarm_service_name=~".+_prometheus|.+_grafana|.+_alertmanager|.+_caddy|.+_unsee|.+cadvisor|.+node-exporter|.+_mongodb-exporter|.+blackbox-exporter",container_label_com_docker_swarm_node_id=~".+"}))) 
+          * 100 > 80
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      description: '{{ $labels.container_label_com_docker_swarm_service_name }} on ''{{
+        $labels.container_label_com_docker_swarm_node_id }}'' memory usage is {{ humanize
+        $value}}%.'
+      summary: Memory alert for Swarm task '{{ $labels.container_label_com_docker_swarm_service_name
+        }}' on '{{ $labels.container_label_com_docker_swarm_node_id }}'  

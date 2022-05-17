@@ -1,0 +1,3 @@
+---
+token: "{{ lookup('file', '../../../tokens/worker-token') }}"
+manager_addrs: "{{ lookup('file', '../../../tokens/manager-address') }}"
