@@ -14,8 +14,8 @@ if [ "$1" == "--list" ] ; then
   cat sorted_inventory_temp | grep node | grep node0 >> inventory_temp
   echo "[workers]" >> inventory_temp
   cat sorted_inventory_temp | grep node | grep -v node0 >> inventory_temp
-  echo "[no_groups]" >> inventory_temp
-  cat sorted_inventory_temp | grep -v node >> inventory_temp
+  echo "[monitoring]" >> inventory_temp
+  cat sorted_inventory_temp | grep monitoring >> inventory_temp
   ansible-inventory --list -i inventory_temp 
   rm inventory_host_temp inventory_ip_temp inventory_temp pre-inventory_temp sorted_inventory_temp
 

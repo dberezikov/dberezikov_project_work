@@ -30,14 +30,21 @@ variable "subnet_id" {
 variable "service_account_key_file" {
   description = "key .json"
 }
-variable "count_of_instances" {
+variable "count_of_node_instances" {
+  description = "Count of instances"
+  default     = 1
+}
+variable "count_of_mon_instances" {
   description = "Count of instances"
   default     = 1
 }
 variable "core_fraction" {
   description = "Core fraction"
 }
-variable "cores" {
+variable "cores_node" {
+  description = "Count of cores"
+}
+variable "cores_mon" {
   description = "Count of cores"
 }
 variable "boot_disk_size" {
@@ -46,6 +53,9 @@ variable "boot_disk_size" {
 variable "boot_disk_type" {
   description = "Boot disk type"
 }
-variable "memory" {
+variable "memory_node" {
+  description = "Count of memory"
+}
+variable "memory_mon" {
   description = "Count of memory"
 }

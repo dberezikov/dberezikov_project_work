@@ -11,15 +11,15 @@ data "yandex_compute_image" "ubuntu-image" {
   family = var.os_release
 }
 
-resource "yandex_compute_instance" "node" {
-  name     = "node${count.index}" 
-  hostname = "node${count.index}"
-  count    = var.count_of_node_instances
+resource "yandex_compute_instance" "monitoring" {
+  name     = "monitoring" 
+  hostname = "monitoring"
+  count    = var.count_of_mon_instances
 
   resources {
     core_fraction = var.core_fraction
-    cores  = var.cores_node
-    memory = var.memory_node
+    cores  = var.cores_mon
+    memory = var.memory_mon
   }
 
   boot_disk {

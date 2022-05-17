@@ -19,19 +19,34 @@ module "node" {
   public_key_path          = var.public_key_path
   private_key_path         = var.private_key_path
   subnet_id                = var.subnet_id
-  count_of_instances       = var.count_of_instances 
+  count_of_node_instances  = var.count_of_node_instances 
   os_release               = var.os_release
   core_fraction            = var.core_fraction
-  cores                    = var.cores
-  memory                   = var.memory
+  cores_node               = var.cores_node
+  memory_node              = var.memory_node
   boot_disk_size           = var.boot_disk_size
   boot_disk_type           = var.boot_disk_type  
 }
 
-resource "null_resource" "ansible" {
+module "monitoring" {
+  source                   = "./modules/monitoring"
+  public_key_path          = var.public_key_path
+  private_key_path         = var.private_key_path
+  subnet_id                = var.subnet_id
+  count_of_mon_instances   = var.count_of_mon_instances 
+  os_release               = var.os_release
+  core_fraction            = var.core_fraction
+  cores_mon                = var.cores_mon
+  memory_mon               = var.memory_mon
+  boot_disk_size           = var.boot_disk_size
+  boot_disk_type           = var.boot_disk_type  
   depends_on = [module.node]
+}
+
+resource "null_resource" "ansible" {
+  depends_on = [module.monitoring] 
   provisioner "local-exec" {
-    command = "sleep 30"
+    command = "sleep 40"
   }
   provisioner "local-exec" {
     command     = "ansible-playbook playbook.yml"

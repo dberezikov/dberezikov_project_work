@@ -7,14 +7,14 @@ variable "private_key_path" {
 variable "os_release" {
   description = "Version of OS"
 }
-variable "count_of_node_instances" {
+variable "count_of_mon_instances" {
   description = "Count of instances"
   default     = 1
 }
 variable "core_fraction" {
   description = "Core fraction"
 }
-variable "cores_node" {
+variable "cores_mon" {
   description = "Count of cores"
 }
 variable "boot_disk_size" {
@@ -23,7 +23,7 @@ variable "boot_disk_size" {
 variable "boot_disk_type" {
   description = "Boot disk type"
 }
-variable "memory_node" {
+variable "memory_mon" {
   description = "Count of memory"
 }
 variable "subnet_id" {

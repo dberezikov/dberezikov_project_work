@@ -13,7 +13,7 @@ services:
     ports:
       - 8020:8080
     networks:
-      - mon
+      - docker_app
     deploy:
       mode: global
       resources:
@@ -26,5 +26,49 @@ services:
       options:
         max-size: "5m"
 
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - '9090:9090'
+    volumes:
+        - prometheus_data:/prometheus
+        - ./prometheus.yml:/etc/prometheus/prometheus.yml
+        - ./alertmanager/alert.rules:/etc/prometheus/alert.rules
+    networks:
+      - docker_app
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention=1d'
+
+  alertmanager: 
+     image: prom/alertmanager 
+     volumes:
+        - ./alertmanager/alertmanager.yml:/alertmanager.yml
+     command: 
+      - '--config.file=/alertmanager.yml' 
+     ports: 
+      - 9093:9093 
+     networks:
+      - docker_app
+
+  grafana:
+    image: grafana/grafana-oss:8.5.0
+    volumes:
+      - grafana_data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=gfadmin
+      - GF_SECURITY_ADMIN_PASSWORD=crawler
+    networks:
+      - docker_app  
+    ports:
+      - 3000:3000
+
+volumes:
+  prometheus_data:
+  grafana_data:
+
 networks:
-  mon:
+  docker_appnet:
+    external:
+      name: docker_app

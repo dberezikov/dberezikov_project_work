@@ -1,0 +1,13 @@
+global:
+  resolve_timeout: 1m
+  slack_api_url: 'https://hooks.slack.com/services/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'
+
+route:
+ receiver: 'slack'
+
+receivers:
+- name: 'slack'
+  slack_configs:
+  - send_resolved: true
+    username: 'crawler_bot'
+    channel: '#crawler'
