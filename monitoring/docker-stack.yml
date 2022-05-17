@@ -75,6 +75,7 @@ services:
     volumes:
       - prometheus_data:/prometheus
       - ./prometheus/:/etc/prometheus/
+      - ./prometheus/rule/alert.rules:/etc/prometheus/alert.rules  
     networks:
       - crawler_app
     command:

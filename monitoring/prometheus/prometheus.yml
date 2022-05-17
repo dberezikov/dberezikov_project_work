@@ -2,9 +2,9 @@
 global:
   scrape_interval: '5s'
 rule_files:
-  - "prometheus/rule/alert.rules"
-  - "prometheus/rule/swarm_node.rules.yml"
-  - "prometheus/rule/swarm_task.rules.yml"    
+  - "./rule/alert.rules"
+  - "./rule/swarm_node.rules.yml"
+  - "./rule/swarm_task.rules.yml"    
 
 scrape_configs:
   - job_name: 'prometheus'
