@@ -1,0 +1,255 @@
+groups:
+- name: tasks
+  rules:
+
+  - alert: task_high_cpu_usage_SWARM_cluster_80
+    expr: sum(rate(container_cpu_usage_seconds_total{container_label_com_docker_swarm_task_name=~".+"}[1m]))
+      BY (container_label_com_docker_swarm_task_name, container_label_com_docker_swarm_node_id)
+      * 100 > 80
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      description: '{{ $labels.container_label_com_docker_swarm_task_name }} on ''{{
+        $labels.container_label_com_docker_swarm_node_id }}'' CPU usage is at {{ humanize
+        $value}}%.'
+      summary: CPU alert for Swarm task '{{ $labels.container_label_com_docker_swarm_task_name
+        }}' on '{{ $labels.container_label_com_docker_swarm_node_id }}'
+#               
+  - alert: task_high_memory_usage_SWARM_cluster_200MB
+    expr: sum(container_memory_rss{container_label_com_docker_swarm_task_name!~".+prometheus.+",container_label_com_docker_swarm_task_name!~".+jenkins.+",container_label_com_docker_swarm_task_name=~".+"}) 
+       by(container_label_com_docker_swarm_task_name, container_label_com_docker_swarm_node_id) > 2e+08
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      description: '{{ $labels.container_label_com_docker_swarm_task_name }} on ''{{
+        $labels.container_label_com_docker_swarm_node_id }}'' memory usage is {{ humanize
+        $value}}.'
+      summary: Memory alert for Swarm task '{{ $labels.container_label_com_docker_swarm_task_name
+        }}' on '{{ $labels.container_label_com_docker_swarm_node_id }}'
+#
+  - alert: task_high_memory_usage_SWARM_cluster_400MB
+    expr: sum(container_memory_rss{container_label_com_docker_swarm_task_name!~".+prometheus.+",container_label_com_docker_swarm_task_name!~".+jenkins.+",container_label_com_docker_swarm_task_name=~".+"})
+      BY (container_label_com_docker_swarm_task_name, container_label_com_docker_swarm_node_id) > 4e+08
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      description: '{{ $labels.container_label_com_docker_swarm_task_name }} on ''{{
+        $labels.container_label_com_docker_swarm_node_id }}'' memory usage is {{ humanize
+        $value}}.'
+      summary: Memory alert for Swarm task '{{ $labels.container_label_com_docker_swarm_task_name
+        }}' on '{{ $labels.container_label_com_docker_swarm_node_id }}'  
+#
+  - alert: task_high_memory_usage_SWARM_cluster_prometheus_800MB
+    expr: sum(container_memory_rss{container_label_com_docker_swarm_task_name=~".+prometheus.+"}) 
+      by(container_label_com_docker_swarm_task_name, container_label_com_docker_swarm_node_id) > 8e+08
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      description: '{{ $labels.container_label_com_docker_swarm_task_name }} on ''{{
+        $labels.container_label_com_docker_swarm_node_id }}'' memory usage is {{ humanize
+        $value}}.'
+      summary: Memory alert for Swarm task '{{ $labels.container_label_com_docker_swarm_task_name
+        }}' on '{{ $labels.container_label_com_docker_swarm_node_id }}' 
+
+  - alert: task_high_memory_usage_SWARM_cluster_jenkins_850MB
+    expr: sum(container_memory_rss{container_label_com_docker_swarm_task_name=~".+jenkins.+"}) 
+      by(container_label_com_docker_swarm_task_name, container_label_com_docker_swarm_node_id) > 8.5e+08
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      description: '{{ $labels.container_label_com_docker_swarm_task_name }} on ''{{
+        $labels.container_label_com_docker_swarm_node_id }}'' memory usage is {{ humanize
+        $value}}.'
+      summary: Memory alert for Swarm task '{{ $labels.container_label_com_docker_swarm_task_name
+        }}' on '{{ $labels.container_label_com_docker_swarm_node_id }}'  
+ 
+#
+  - alert: task_high_cpu_usage_ECS_cluster_80
+    expr: sum by (container_label_com_amazonaws_ecs_container_name,node_id) (rate(container_cpu_usage_seconds_total{container_label_com_amazonaws_ecs_cluster=~".+",container_label_com_amazonaws_ecs_container_name=~".+",node_id=~".+"}[5m])) * 100 > 80
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      description: '{{ $labels.container_label_com_amazonaws_ecs_container_name }} on ''{{
+        $labels.node_id }}'' Cpu usage is at {{ humanize
+        $value}}.'
+      summary: CPU alert for ECS-task '{{ $labels.container_label_com_amazonaws_ecs_container_name
+        }}' on '{{ $labels.node_id }}' 
+#
+  - alert: task_high_memory_usage_ECS_cluster_200MB
+    expr: sum(avg_over_time(container_memory_usage_bytes{container_label_com_amazonaws_ecs_cluster=~".+",container_label_com_amazonaws_ecs_container_name!~"myservicename",container_label_com_amazonaws_ecs_container_name!~"db",container_label_com_amazonaws_ecs_container_name=~".+",node_id=~".+"}[5m])) by (container_label_com_amazonaws_ecs_container_name,node_id) > 2e+08
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      description: '{{ $labels.container_label_com_amazonaws_ecs_container_name }} on ''{{
+        $labels.node_id }}'' memory usage is {{ humanize
+        $value}}.'
+      summary: Memory alert for ECS-task '{{ $labels.container_label_com_amazonaws_ecs_container_name
+        }}' on '{{ $labels.node_id }}'      
+#
+  - alert: task_high_memory_usage_ECS_cluster_400MB
+    expr: sum(avg_over_time(container_memory_usage_bytes{container_label_com_amazonaws_ecs_cluster=~".+",container_label_com_amazonaws_ecs_container_name!~"myservicename",container_label_com_amazonaws_ecs_container_name!~"db",container_label_com_amazonaws_ecs_container_name=~".+",node_id=~".+"}[5m])) by (container_label_com_amazonaws_ecs_container_name,node_id) > 4e+08
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      description: '{{ $labels.container_label_com_amazonaws_ecs_container_name }} on ''{{
+        $labels.node_id }}'' memory usage is {{ humanize
+        $value}}.'
+      summary: Memory alert for ECS-task '{{ $labels.container_label_com_amazonaws_ecs_container_name
+        }}' on '{{ $labels.node_id }}'  
+#
+  - alert: task_high_memory_usage_ECS_cluster_myservicename_4.2GB
+    expr: avg_over_time(container_memory_usage_bytes{node_id=~".+",container_label_com_amazonaws_ecs_cluster=~".+",container_label_com_amazonaws_ecs_container_name=~"myservicename"}[5m]) > 4.2e+09
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      description: '{{ $labels.container_label_com_amazonaws_ecs_container_name }} on ''{{
+        $labels.node_id }}'' memory usage is {{ humanize
+        $value}}.'
+      summary: Memory alert for ECS-task '{{ $labels.container_label_com_amazonaws_ecs_container_name
+        }}' on '{{ $labels.node_id }}'      
+
+  - alert: task_high_memory_usage_ECS_cluster_db_1.2GB
+    expr: avg_over_time(container_memory_usage_bytes{node_id=~".+",container_label_com_amazonaws_ecs_cluster=~".+",container_label_com_amazonaws_ecs_container_name=~"db"}[5m]) > 1.2e+09
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      description: '{{ $labels.container_label_com_amazonaws_ecs_container_name }} on ''{{
+        $labels.node_id }}'' memory usage is {{ humanize
+        $value}}.'
+      summary: Memory alert for ECS-task '{{ $labels.container_label_com_amazonaws_ecs_container_name
+        }}' on '{{ $labels.node_id }}'    
+
+  - alert: Service unsee is down in SWARM cluster
+    expr: absent(container_memory_usage_bytes{container_label_com_docker_swarm_service_name=~".+_unsee"}) 
+    for: 2m
+    labels:
+     severity: critical
+    annotations:
+     description: Service 'unsee' is down for more 2 minutes
+     summary: Service alert for SWARM service 'unsee'
+
+  - alert: Service mongodb-exporter is down in SWARM cluster
+    expr: absent(container_memory_usage_bytes{container_label_com_docker_swarm_service_name=~".+_mongodb-exporter"}) 
+    for: 2m
+    labels:
+     severity: critical
+    annotations:
+     description: Service 'mongodb-exporter' is down for more 2 minutes
+     summary: Service alert for SWARM service 'mongodb-exporter'
+
+  - alert: Service prometheus is down in SWARM cluster
+    expr: absent(container_memory_usage_bytes{container_label_com_docker_swarm_service_name=~".+_prometheus"}) 
+    for: 2m
+    labels:
+     severity: critical
+    annotations:
+     description: Service 'prometheus' is down for more 2 minutes
+     summary: Service alert for SWARM service 'prometheus'
+
+  - alert: Service grafana is down in SWARM cluster
+    expr: absent(container_memory_usage_bytes{container_label_com_docker_swarm_service_name=~".+_grafana"}) 
+    for: 2m
+    labels:
+     severity: critical
+    annotations:
+     description: Service 'grafana' is down for more 2 minutes
+     summary: Service alert for SWARM service 'grafana'
+
+  - alert: Service alertmanager is down in SWARM cluster
+    expr: absent(container_memory_usage_bytes{container_label_com_docker_swarm_service_name=~".+_alertmanager"}) 
+    for: 2m
+    labels:
+     severity: critical
+    annotations:
+     description: Service 'alertmanager' is down for more 2 minutes
+     summary: Service alert for SWARM service 'alertmanager'
+
+  - alert: Service caddy is down in SWARM cluster
+    expr: absent(container_memory_usage_bytes{container_label_com_docker_swarm_service_name=~".+_caddy"}) 
+    for: 2m
+    labels:
+     severity: critical
+    annotations:
+     description: Service 'caddy' is down for more 2 minutes
+     summary: Service alert for SWARM service 'caddy'
+
+  - alert: Service myservicename is down in ECS cluster
+    expr: absent(container_memory_usage_bytes{container_label_com_amazonaws_ecs_task_definition_family=~"myservicename"})
+    for: 2m
+    labels:
+     severity: critical
+    annotations:
+     description: Service 'couchdb' is down for more 2 minutes
+     summary: Service alert for ECS service 'myservicename'
+
+  - alert: Service db is down in ECS cluster
+    expr: absent(container_memory_usage_bytes{container_label_com_amazonaws_ecs_task_definition_family=~"db"})
+    for: 2m
+    labels:
+     severity: critical
+    annotations:
+     description: Service 'couchdb' is down for more 2 minutes
+     summary: Service alert for ECS service 'db'
+
+  - alert: Service couchdb is down in ECS cluster
+    expr: absent(container_memory_usage_bytes{container_label_com_amazonaws_ecs_task_definition_family=~"couchdb"})
+    for: 2m
+    labels:
+     severity: critical
+    annotations:
+     description: Service 'couchdb' is down for more 2 minutes
+     summary: Service alert for ECS service 'couchdb'
+
+  - alert: Service couchdb-exporter is down in ECS cluster
+    expr: absent(container_memory_usage_bytes{container_label_com_amazonaws_ecs_task_definition_family=~"couchdb-exporter.+"})
+    for: 2m
+    labels:
+     severity: critical
+    annotations:
+     description: Service 'couchdb-exporter' is down for more 2 minutes
+     summary: Service alert for ECS service 'couchdb-exporter'
+
+  - alert: task_high_memory_usage_SWARM_cluster_percent_80
+    expr: ( sum by(container_label_com_docker_swarm_service_name, container_label_com_docker_swarm_node_id)
+          (avg_over_time(container_memory_usage_bytes{container_label_com_docker_swarm_node_id=~".+", id=~"/docker/.+"}[1m]))
+          /
+          (sum by(container_label_com_docker_swarm_service_name, container_label_com_docker_swarm_node_id) 
+          (container_spec_memory_limit_bytes{container_label_com_docker_swarm_service_name=~".+_prometheus|.+_grafana|.+_alertmanager|.+_caddy|.+_unsee|.+cadvisor|.+node-exporter|.+_mongodb-exporter|.+blackbox-exporter",container_label_com_docker_swarm_node_id=~".+"}))) 
+          * 100 > 80
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      description: '{{ $labels.container_label_com_docker_swarm_service_name }} on ''{{
+        $labels.container_label_com_docker_swarm_node_id }}'' memory usage is {{ humanize
+        $value}}%.'
+      summary: Memory alert for Swarm task '{{ $labels.container_label_com_docker_swarm_service_name
+        }}' on '{{ $labels.container_label_com_docker_swarm_node_id }}'  
+#
+
+  - alert: task_high_memory_usage_ECS_cluster_percent_80
+    expr: (sum by (container_label_com_amazonaws_ecs_task_definition_family,node_id) 
+          (container_memory_usage_bytes{container_label_com_amazonaws_ecs_task_definition_family=~".+"}) 
+          /
+          sum by(container_label_com_amazonaws_ecs_task_definition_family,node_id) 
+          (container_spec_memory_limit_bytes{node_id=~".+",container_label_com_amazonaws_ecs_task_definition_family=~"myservicename|couchdb|db"}) ) 
+          * 100 > 80
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      description: '{{ $labels.container_label_com_amazonaws_ecs_task_definition_family }} on ''{{
+        $labels.node_id }}'' memory usage is {{ humanize
+        $value}}%.'
+      summary: Memory alert for ECS task '{{ $labels.container_label_com_amazonaws_ecs_task_definition_family
+        }}' on '{{ $labels.node_id }}'

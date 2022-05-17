@@ -1,18 +1,18 @@
 ---
-- name: Create a directory if it does not exist
-  ansible.builtin.file:
-    path: /home/ubuntu/mon
-    state: directory
-    mode: '0755'
+#- name: Create a directory if it does not exist
+#  ansible.builtin.file:
+#    path: /home/ubuntu/mon
+#    state: directory
+#    mode: '0755'
 
 - name: Copy directory of services
   copy:
-    src: ../monitoring/docker-stack.yml
-    dest: /home/ubuntu/mon
+    src: ../monitoring
+    dest: /home/ubuntu
 
 - name: Deploy stack from a compose file
   docker_stack:
     state: present
     name: mon
     compose:
-    - /home/ubuntu/mon/docker-stack.yml
+    - /home/ubuntu/monitoring/docker-stack.yml

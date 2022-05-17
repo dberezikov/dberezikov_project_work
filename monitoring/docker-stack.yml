@@ -1,9 +1,24 @@
 version: "3"
 
 services:
+  influx:   
+#    image: influxdb   
+    image: influxdb:1.8-alpine   
+    volumes:     
+      - influx:/var/lib/influxdb
+    networks:
+      - crawler_app
+    deploy: 
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.labels.key == mon
+
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
-    command: -logtostderr -docker_only
+    hostname: '{{.Node.Hostname}}'    
+    command: -logtostderr -docker_only -storage_driver=influxdb -storage_driver_db=cadvisor -storage_driver_host=influx:8086
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /:/rootfs:ro
@@ -13,7 +28,32 @@ services:
     ports:
       - 8020:8080
     networks:
-      - docker_app
+      - crawler_app
+    deploy:
+      mode: global
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 64M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+      - /etc/hostname:/etc/nodename        
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.ignored-mount-points="^/(sys|proc|dev|host|etc)($$|/)"'
+    networks:
+      - crawler_app
     deploy:
       mode: global
       resources:
@@ -31,44 +71,64 @@ services:
     ports:
       - '9090:9090'
     volumes:
-        - prometheus_data:/prometheus
-        - ./prometheus.yml:/etc/prometheus/prometheus.yml
-        - ./alertmanager/alert.rules:/etc/prometheus/alert.rules
+      - prometheus_data:/prometheus
+      - ./prometheus/:/etc/prometheus/
     networks:
-      - docker_app
+      - crawler_app
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
       - '--storage.tsdb.retention=1d'
+    deploy:
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.labels.key == mon
 
   alertmanager: 
-     image: prom/alertmanager 
-     volumes:
-        - ./alertmanager/alertmanager.yml:/alertmanager.yml
-     command: 
-      - '--config.file=/alertmanager.yml' 
-     ports: 
+    image: prom/alertmanager 
+    volumes:
+      - ./alertmanager/:/etc/alertmanager/
+    command: 
+      - '--config.file=/etc/alertmanager/config.yml'
+      - '--storage.path=/alertmanager'       
+    ports: 
       - 9093:9093 
-     networks:
-      - docker_app
+    networks:
+      - crawler_app
+    deploy:
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.labels.key == mon
 
   grafana:
-    image: grafana/grafana-oss:8.5.0
+#    image: grafana/grafana-oss:8.5.0
+    image: grafana/grafana:7.5.4
     volumes:
       - grafana_data:/var/lib/grafana
     environment:
-      - GF_SECURITY_ADMIN_USER=gfadmin
-      - GF_SECURITY_ADMIN_PASSWORD=crawler
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin_pass
     networks:
-      - docker_app  
+      - crawler_app  
     ports:
       - 3000:3000
+    deploy:
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.labels.key == mon
 
 volumes:
+  influx:
   prometheus_data:
   grafana_data:
 
 networks:
-  docker_appnet:
+  crawler_app:
     external:
-      name: docker_app
+      name: crawler_app

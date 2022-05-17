@@ -46,7 +46,7 @@ module "monitoring" {
 resource "null_resource" "ansible" {
   depends_on = [module.monitoring] 
   provisioner "local-exec" {
-    command = "sleep 40"
+    command = "sleep 60"
   }
   provisioner "local-exec" {
     command     = "ansible-playbook playbook.yml"

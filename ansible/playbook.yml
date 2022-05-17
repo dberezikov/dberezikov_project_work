@@ -16,12 +16,24 @@
   become: true
   roles:
     - workers-join
-    
+
+- name: Add monitoring as manager
+  hosts: manager
+  become: true
+  roles:
+    - manager-add
+
 - name: Add db node label
   hosts: manager
   become: true
   roles:
     - node-label-db 
+
+- name: Add mon node label
+  hosts: manager
+  become: true
+  roles:
+    - node-label-mon 
 
 - name: Deploy applications
   hosts: manager
@@ -30,8 +42,7 @@
     - app-deploy 
 
 - name: Deploy monitoring 
-  hosts: manager
+  hosts: monitoring
   become: true
   roles:
-    - mon-deploy 
-
+    - mon-deploy
