@@ -140,4 +140,4 @@ dmypy.json
 tokens
 
 # Prometheus Alertmanager
-alertmanager/config.yml
+monitoring/alertmanager/config.yml
