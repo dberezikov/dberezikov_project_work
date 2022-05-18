@@ -8,7 +8,7 @@ services:
     ports:
       - 27017:27017
     networks:
-      - app
+      - crawler_app
     deploy:
       restart_policy:
         condition: on-failure
@@ -28,7 +28,7 @@ services:
       - 5672:5672
       - 15672:15672
     networks:
-      - app
+      - crawler_app
     deploy:
       restart_policy:
         condition: on-failure
@@ -50,7 +50,12 @@ services:
     ports:
       - 8000:8000
     networks:
-      - app
+      - crawler_app
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-async-connect: "true"
+        tag: service.crawler
     deploy:
       mode: replicated      
       replicas: 3
@@ -65,7 +70,12 @@ services:
     ports:
       - 80:8000
     networks:
-      - app
+      - crawler_app
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-async-connect: "true"
+        tag: service.crawler_ui
     deploy:
       mode: replicated      
       replicas: 2 
@@ -78,4 +88,6 @@ volumes:
   rabbitmq_log:
 
 networks:
-  app:
+  crawler_app:
+    external:
+      name: crawler_app
