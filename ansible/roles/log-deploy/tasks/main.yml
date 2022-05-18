@@ -1,0 +1,12 @@
+---
+- name: Copy directory of services
+  copy:
+    src: ../logging
+    dest: /home/ubuntu
+
+- name: Deploy stack from a compose file
+  docker_stack:
+    state: present
+    name: log
+    compose:
+    - /home/ubuntu/logging/docker-stack.yml

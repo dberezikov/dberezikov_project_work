@@ -138,3 +138,6 @@ dmypy.json
 
 # Docker
 tokens
+
+# Prometheus Alertmanager
+monitoring/alertmanager/config.yml

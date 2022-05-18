@@ -35,6 +35,18 @@
   roles:
     - node-label-mon 
 
+- name: Network add
+  hosts: manager
+  become: true
+  roles:
+    - network-add
+
+- name: Deploy logging 
+  hosts: monitoring
+  become: true
+  roles:
+    - log-deploy
+
 - name: Deploy applications
   hosts: manager
   become: true

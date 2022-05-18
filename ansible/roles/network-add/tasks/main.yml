@@ -1,0 +1,4 @@
+- name: Create overlay networks 
+  docker_network:
+    name: crawler_app
+    driver: overlay
