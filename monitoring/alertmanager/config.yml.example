@@ -1,0 +1,12 @@
+global:
+  resolve_timeout: 1m
+  slack_api_url: "XXX"
+
+route:
+  receiver: 'slack'
+
+receivers:
+- name: 'slack'
+  slack_configs:
+  - channel: '#alerts_dberezikov'
+    send_resolved: true
