@@ -1,0 +1,3 @@
+---
+gitlab_url: "{{ lookup('file', '../../../tokens/gitlab_url') }}"
+gitlab_token: "{{ lookup('file', '../../../tokens/gitlab_token') }}"

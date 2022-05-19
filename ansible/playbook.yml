@@ -58,3 +58,15 @@
   become: true
   roles:
     - mon-deploy
+
+- name: Install Gitlab runner
+  hosts: manager
+  become: true
+  roles:
+    - gitlab-runner-install  
+
+- name: Add user gitlab-runner to group docker
+  hosts: manager
+  become: true
+  roles:
+    - user-group-add

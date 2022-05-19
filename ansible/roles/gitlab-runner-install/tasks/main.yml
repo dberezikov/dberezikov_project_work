@@ -1,0 +1,12 @@
+- name: "Install gitlab runner"
+  command: |
+    curl -LJO "https://gitlab-runner-downloads.s3.amazonaws.com/latest/deb/gitlab-runner_amd64.deb"
+    dpkg -i gitlab-runner_amd64.deb    
+
+- name: "Register runner"
+  command: |
+    gitlab-runner register \
+    --url "{{ gitlab_url }}" \
+    --registration-token "{{ gitlab_token }}" \
+    --executor shell \
+    --description "swarm-runner"
