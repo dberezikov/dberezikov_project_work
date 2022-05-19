@@ -1,0 +1,4 @@
+- name: Add user gitlab-runner to group docker
+  ansible.builtin.user:
+    name: gitlab-runner
+    group: docker

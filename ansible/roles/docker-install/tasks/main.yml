@@ -41,3 +41,7 @@
 - name: Install JSON Diff
   pip:
     name: jsondiff
+
+- name: Install Gitlab module
+  pip:
+    name: python-gitlab
