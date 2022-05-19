@@ -1,9 +1,9 @@
 - name: Install gitlab runner
   apt: name=gitlab-runner state=latest update_cache=yes
 
-- name: "Register runner"
+- name: Register runner
   command: |
-    gitlab-runner register \
+    gitlab-runner register -n \
     --url "{{ gitlab_url }}" \
     --registration-token "{{ gitlab_token }}" \
     --executor shell \
